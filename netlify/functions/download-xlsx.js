@@ -2,16 +2,20 @@
 // dan mengirimkannya kembali dengan header HTTP yang benar (Content-Type +
 // Content-Disposition), supaya nama file & tipe file terdeteksi dengan benar
 // oleh WebView Android di dalam APK (blob: URL dari JS tidak bisa melakukan ini).
+// Cache-Control: no-store dipasang di semua response supaya WebView/proxy
+// tidak pernah menyajikan ulang response lama untuk URL yang sama.
 
 exports.handler = async (event) => {
   const method = event.httpMethod;
 
-  // GET/HEAD dipakai aplikasi untuk mengecek apakah endpoint ini sudah aktif.
   if (method !== 'POST') {
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'KasbonDonk export endpoint aktif.'
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store'
+      },
+      body: JSON.stringify({ status: 'ok', message: 'KasbonDonk export endpoint aktif.' })
     };
   }
 
@@ -22,19 +26,28 @@ exports.handler = async (event) => {
     const base64data = params.get('base64data');
 
     if (!base64data) {
-      return { statusCode: 400, body: 'Data file tidak ditemukan.' };
+      return {
+        statusCode: 400,
+        headers: { 'Cache-Control': 'no-store' },
+        body: 'Data file tidak ditemukan.'
+      };
     }
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="${filename}"`
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'no-store'
       },
       body: base64data,
       isBase64Encoded: true
     };
   } catch (err) {
-    return { statusCode: 500, body: 'Export gagal: ' + err.message };
+    return {
+      statusCode: 500,
+      headers: { 'Cache-Control': 'no-store' },
+      body: 'Export gagal: ' + err.message
+    };
   }
 };
