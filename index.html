@@ -1506,7 +1506,7 @@ async function exportWorkbookForPlatform(wb, filename){
 
   if(base64){
     try{
-      const viaNetlify = await tryNetlifyFunctionExport(base64, filename);
+      const viaNetlify = await submitExportForm(base64, filename);
       if(viaNetlify){ showToast('File Excel sedang diunduh...'); return; }
     }catch(err){ console.error('Export via Netlify Function gagal:', err); }
   }
@@ -1536,25 +1536,15 @@ async function exportWorkbookForPlatform(wb, filename){
 
 /* Cek dulu apakah Netlify Function-nya sudah di-deploy (GET/HEAD dibalas cepat).
    Kalau belum ada (404 / gagal fetch), diamkan saja dan lanjut ke cara berikutnya. */
-async function tryNetlifyFunctionExport(base64, filename){
-  try{
-    const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 3000);
-    const res = await fetch('/.netlify/functions/download-xlsx', {method:'GET', signal:controller.signal});
-    clearTimeout(timeout);
-    if(!res.ok) return false;
-  }catch(err){
-    return false;
-  }
-  return submitExportForm(base64, filename);
-}
-
 function submitExportForm(base64, filename){
   return new Promise((resolve)=>{
     const filenameInput = document.getElementById('exportFilenameInput');
     const base64Input = document.getElementById('exportBase64Input');
     const form = document.getElementById('exportForm');
     if(!filenameInput || !base64Input || !form){ resolve(false); return; }
+    // Cache-bust: hindari kemungkinan WebView menyajikan ulang response GET
+    // sebelumnya untuk URL yang sama saat POST dikirim ke URL ini.
+    form.action = '/.netlify/functions/download-xlsx?t=' + Date.now();
     filenameInput.value = filename;
     base64Input.value = base64;
     form.submit();
