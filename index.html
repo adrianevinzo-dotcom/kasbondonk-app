@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KasbonDonk by Garuda Steam — Buku Kas Karyawan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --paper:#F3EFE3;
+    --paper-alt:#EAE3D2;
+    --card:#FBF8F0;
+    --ink:#1F2D3D;
+    --ink-soft:#5B6472;
+    --green:#2F6F4F;
+    --green-soft:#E4EEE7;
+    --red:#A8351F;
+    --red-soft:#F3E4E0;
+    --gold:#B8863B;
+    --gold-soft:#F2E9D8;
+    --blue:#2C5F8A;
+    --blue-soft:#E2ECF3;
+    --purple:#6B4C93;
+    --purple-soft:#EAE3F0;
+    --brown:#6E4F32;
+    --brown-soft:#EDE2D3;
+    --teal:#2F6B69;
+    --teal-soft:#E1EEEC;
+    --line:#CCC2A6;
+    --shadow: 0 2px 8px rgba(31,45,61,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:
+      repeating-linear-gradient(var(--paper) 0 31px, rgba(31,45,61,0.045) 31px 32px),
+      var(--paper);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .num{font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums; letter-spacing:-0.2px;}
+
+  header.app-head{
+    padding:28px 20px 0;
+    max-width:1080px;
+    margin:0 auto;
+  }
+  .brand{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  }
+  .brand h1{
+    font-family:'Roboto Slab',serif;
+    font-weight:700;
+    font-size:32px;
+    margin:0;
+    color:var(--ink);
+  }
+  .brand h1 span{color:var(--green);}
+  .brand .tagline{
+    color:var(--ink-soft);
+    font-size:13px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+
+  nav.tabs{
+    display:flex; gap:6px; margin-top:22px; flex-wrap:wrap;
+  }
+  nav.tabs button{
+    font-family:'Roboto Slab',serif;
+    font-weight:600;
+    font-size:13px;
+    border:none;
+    cursor:pointer;
+    padding:11px 13px 9px;
+    border-radius:10px 10px 0 0;
+    background:var(--paper-alt);
+    color:var(--ink-soft);
+    position:relative;
+    top:2px;
+    transition:transform .15s ease, background .15s ease, color .15s ease;
+  }
+  nav.tabs button:hover{ color:var(--ink); }
+  nav.tabs button.active{
+    background:var(--card);
+    color:#fff;
+    top:0;
+    transform:translateY(-2px);
+    box-shadow:var(--shadow);
+  }
+  nav.tabs button.active[data-tab="dashboard"]{ background:var(--ink); color:#fff; }
+  nav.tabs button.active[data-tab="karyawan"]{ background:var(--gold); color:#fff; }
+  nav.tabs button.active[data-tab="kasbon"]{ background:var(--green); color:#fff; }
+  nav.tabs button.active[data-tab="absensi"]{ background:var(--red); color:#fff; }
+  nav.tabs button.active[data-tab="pendapatan"]{ background:var(--blue); color:#fff; }
+  nav.tabs button.active[data-tab="cicilan"]{ background:var(--purple); color:#fff; }
+  nav.tabs button.active[data-tab="slip"]{ background:var(--teal); color:#fff; }
+  nav.tabs button.active[data-tab="pengaturan"]{ background:var(--brown); color:#fff; }
+
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:0 20px;
+  }
+  .panel{
+    background:var(--card);
+    border-radius:0 12px 12px 12px;
+    box-shadow:var(--shadow);
+    padding:26px;
+    border:1px solid var(--line);
+  }
+  .section-title{
+    font-family:'Roboto Slab',serif;
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  .section-sub{
+    color:var(--ink-soft);
+    font-size:13.5px;
+    margin:0 0 20px;
+  }
+
+  .form-row{
+    display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px;
+  }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field label{ font-size:12.5px; font-weight:600; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.03em;}
+  .field input, .field select, .field textarea{
+    font-family:'Inter',sans-serif;
+    font-size:14.5px;
+    padding:9px 11px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    color:var(--ink);
+    min-width:150px;
+  }
+  .field input.num-input, .field input[type=date]{ font-family:'IBM Plex Mono',monospace; }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:2px solid var(--ink); outline-offset:1px;
+  }
+  .field .hint{ font-size:11.5px; color:var(--ink-soft); font-weight:400; text-transform:none; margin-top:2px; }
+
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:14px;
+    border:none;
+    border-radius:8px;
+    padding:10px 18px;
+    cursor:pointer;
+    transition:filter .15s ease, transform .05s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--ink); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.2); }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--line); }
+  .btn-ghost:hover{ color:var(--ink); }
+  .btn-danger{ background:transparent; color:var(--red); border:1.5px solid var(--red-soft); padding:6px 12px; font-size:13px; }
+  .btn-danger:hover{ background:var(--red-soft); }
+  .btn-edit{ background:transparent; color:var(--ink-soft); border:1.5px solid var(--line); padding:6px 12px; font-size:13px; }
+  .btn-edit:hover{ color:var(--ink); border-color:var(--ink); }
+  .btn-sm{ padding:6px 12px; font-size:13px; border-radius:7px; }
+
+  table{ width:100%; border-collapse:collapse; }
+  .table-wrap{ overflow-x:auto; border-top:1.5px solid var(--line); }
+  th{
+    text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:0.03em;
+    color:var(--ink-soft); padding:10px 8px; border-bottom:1.5px solid var(--line);
+    white-space:nowrap;
+  }
+  td{
+    padding:11px 8px; border-bottom:1px solid var(--line); font-size:13.5px; vertical-align:middle;
+    white-space:nowrap;
+  }
+  tr:hover td{ background:rgba(31,45,61,0.025); }
+  td.right, th.right{ text-align:right; }
+  .actions-cell{ display:flex; gap:6px; justify-content:flex-end; }
+
+  .empty-state{
+    text-align:center; padding:38px 20px; color:var(--ink-soft);
+  }
+  .empty-state .big{ font-size:34px; margin-bottom:6px; }
+
+  .summary-cards{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px; }
+  .scard{
+    flex:1; min-width:150px;
+    background:var(--paper-alt);
+    border-radius:10px; padding:14px 16px;
+    border-left:4px solid var(--ink);
+  }
+  .scard.green{ border-left-color:var(--green); background:var(--green-soft); }
+  .scard.red{ border-left-color:var(--red); background:var(--red-soft); }
+  .scard.gold{ border-left-color:var(--gold); background:var(--gold-soft); }
+  .scard.blue{ border-left-color:var(--blue); background:var(--blue-soft); }
+  .scard.purple{ border-left-color:var(--purple); background:var(--purple-soft); }
+  .scard .label{ font-size:11px; text-transform:uppercase; letter-spacing:0.03em; color:var(--ink-soft); margin-bottom:4px; }
+  .scard .value{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:18px; }
+
+  .stamp{
+    display:inline-block;
+    border:3px double var(--red);
+    color:var(--red);
+    padding:10px 22px;
+    border-radius:10px;
+    transform:rotate(-3deg);
+    font-family:'Roboto Slab',serif;
+    text-align:center;
+    background:rgba(168,53,31,0.03);
+  }
+  .stamp .stamp-label{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.85; }
+  .stamp .stamp-value{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:700; margin-top:2px; }
+
+  .month-picker{ display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+  .month-picker input, .month-picker select{ font-family:'IBM Plex Mono',monospace; padding:8px 10px; border-radius:8px; border:1.5px solid var(--line); background:#fff; }
+  .month-picker label{ font-size:12.5px; color:var(--ink-soft); font-weight:600; }
+
+  .checklist{ display:flex; flex-direction:column; gap:2px; border-top:1.5px solid var(--line); margin-bottom:16px;}
+  .check-row{
+    display:flex; align-items:center; gap:10px; padding:10px 6px; border-bottom:1px solid var(--line); flex-wrap:wrap;
+  }
+  .check-row label.emp-name{ font-size:14.5px; flex:1; min-width:110px; }
+  .check-row select{ font-family:'IBM Plex Mono',monospace; font-size:13px; padding:6px 8px; border-radius:7px; border:1.5px solid var(--line); background:#fff; }
+  .check-row select.status-select{ font-family:'Inter',sans-serif; min-width:120px; }
+  .check-row select:disabled{ background:var(--paper-alt); color:var(--ink-soft); }
+  .check-row .tag{ font-size:11.5px; padding:2px 8px; border-radius:20px; font-weight:600; }
+  .tag.absen{ background:var(--red-soft); color:var(--red); }
+  .tag.hadir{ background:var(--green-soft); color:var(--green); }
+  .tag.libur{ background:var(--blue-soft); color:var(--blue); }
+  .check-row input[type=checkbox]{ width:17px; height:17px; accent-color:var(--teal); }
+
+  .preview-box{
+    background:var(--paper-alt); border-radius:10px; padding:14px 16px; margin-bottom:16px;
+    font-size:13.5px; line-height:1.7; color:var(--ink-soft);
+  }
+  .preview-box b{ color:var(--ink); }
+  .warn-line{ color:var(--red); font-weight:600; margin-bottom:6px; display:block; }
+
+  .history-list{ margin-top:26px; }
+  .hist-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 4px; border-bottom:1px solid var(--line); font-size:13.5px; cursor:pointer;
+  }
+  .hist-item:hover{ background:rgba(31,45,61,0.03); }
+  .hist-item .d{ font-family:'IBM Plex Mono',monospace; font-weight:600; }
+
+  .toast{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:11px 20px; border-radius:8px;
+    font-size:13.5px; box-shadow:var(--shadow); z-index:50; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease; max-width:86vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-6px); }
+
+  .loading-overlay{
+    position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:10px; z-index:100;
+  }
+  .spinner{
+    width:34px; height:34px; border:3px solid var(--line); border-top-color:var(--ink);
+    border-radius:50%; animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .cancel-edit{ font-size:12.5px; color:var(--ink-soft); cursor:pointer; text-decoration:underline; margin-left:8px; }
+  .note-box{ margin-top:18px; font-size:12.5px; color:var(--ink-soft); line-height:1.7; }
+  .status-pill{ font-size:11.5px; padding:3px 9px; border-radius:20px; font-weight:600; white-space:nowrap; }
+  .status-pill.active{ background:var(--green-soft); color:var(--green); }
+  .status-pill.pending{ background:var(--gold-soft); color:var(--gold); }
+  .status-pill.done{ background:var(--paper-alt); color:var(--ink-soft); }
+
+  .jamkerja-grid{ display:flex; flex-direction:column; gap:2px; border-top:1.5px solid var(--line); margin-bottom:22px; }
+  .jamkerja-row{ display:flex; align-items:center; gap:12px; padding:10px 6px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  .jamkerja-row .day-name{ flex:1; min-width:90px; font-size:14.5px; font-weight:600; }
+  .jamkerja-row .jam-field{ display:flex; align-items:center; gap:6px; }
+  .jamkerja-row .jam-field label{ font-size:11.5px; color:var(--ink-soft); }
+  .jamkerja-row select{ font-family:'IBM Plex Mono',monospace; font-size:13px; padding:6px 8px; border-radius:7px; border:1.5px solid var(--line); background:#fff; }
+
+  .data-actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:8px; }
+
+  /* ---- Slip Pembukuan ---- */
+  .slip-select-actions{ display:flex; gap:10px; margin-bottom:10px; }
+  .slip-sheet{
+    background:#fff; color:#1a1a1a; border:1px solid var(--line); border-radius:10px;
+    padding:28px; margin-bottom:22px; max-width:560px;
+  }
+  .slip-header{ display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid #1a1a1a; padding-bottom:10px; margin-bottom:16px; }
+  .slip-brand{ font-family:'Roboto Slab',serif; font-weight:700; font-size:18px; }
+  .slip-brand span{ color:var(--green); }
+  .slip-title{ font-size:11.5px; letter-spacing:0.08em; font-weight:700; text-transform:uppercase; }
+  .slip-meta{ display:flex; flex-wrap:wrap; gap:22px; margin-bottom:18px; }
+  .slip-meta div{ font-size:13px; }
+  .slip-meta span{ display:block; color:#777; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:2px; }
+  .slip-meta b{ font-family:'IBM Plex Mono',monospace; }
+  .slip-table{ width:100%; border-collapse:collapse; margin-bottom:16px; }
+  .slip-table td{ padding:6px 4px; font-size:13.5px; border-bottom:1px solid #eee; white-space:normal; }
+  .slip-table tr.slip-section td{ font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; padding-top:14px; border-bottom:1.5px solid #333; color:#333; }
+  .slip-table tr.slip-subtotal td{ font-weight:700; border-top:1px solid #999; border-bottom:1px solid transparent; }
+  .slip-total{
+    display:flex; justify-content:space-between; align-items:center;
+    background:#f3efe3; padding:12px 16px; border-radius:8px;
+    font-family:'Roboto Slab',serif; font-weight:700; font-size:16px; margin-bottom:30px;
+  }
+  .slip-sign{ display:flex; justify-content:space-between; font-size:12px; text-align:center; }
+  .slip-sign .line{ border-bottom:1px solid #333; width:150px; height:50px; margin:0 auto 6px; }
+  .slip-footer-note{ margin-top:18px; font-size:10.5px; color:#888; }
+
+  @media print{
+    body *{ visibility:hidden; }
+    #slipPrintArea, #slipPrintArea *{ visibility:visible; }
+    #slipPrintArea{ position:absolute; left:0; top:0; width:100%; margin:0; padding:0; }
+    .slip-sheet{ box-shadow:none; border:1px solid #333; page-break-after:always; max-width:100%; }
+    .slip-sheet:last-child{ page-break-after:auto; }
+  }
+
+  @media (max-width:640px){
+    .brand h1{ font-size:26px; }
+    .panel{ padding:18px; border-radius:0 10px 10px 10px; }
+    .scard{ min-width:135px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:13.5px;color:var(--ink-soft)">Membuka buku kas...</div>
+</div>
+
+<header class="app-head">
+  <div class="brand">
+    <h1>Kasbon<span>Donk</span></h1>
+    <div class="tagline">by Garuda Steam · Buku Kas Digital Karyawan</div>
+  </div>
+  <nav class="tabs" id="tabNav">
+    <button data-tab="dashboard" onclick="switchTab('dashboard')">📊 Laporan</button>
+    <button data-tab="karyawan" onclick="switchTab('karyawan')">👤 Karyawan</button>
+    <button data-tab="kasbon" onclick="switchTab('kasbon')">💵 Kasbon</button>
+    <button data-tab="absensi" onclick="switchTab('absensi')">✅ Absensi</button>
+    <button data-tab="pendapatan" onclick="switchTab('pendapatan')">💰 Pendapatan</button>
+    <button data-tab="cicilan" onclick="switchTab('cicilan')">🧾 Cicilan</button>
+    <button data-tab="slip" onclick="switchTab('slip')">🖨️ Slip</button>
+    <button data-tab="pengaturan" onclick="switchTab('pengaturan')">⚙️ Pengaturan</button>
+  </nav>
+</header>
+
+<main>
+  <div class="panel" id="panelContent"></div>
+</main>
+
+<input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none" onchange="handleImportFile(event)">
+<iframe name="exportFrame" id="exportFrame" style="display:none"></iframe>
+<form id="exportForm" method="POST" action="/.netlify/functions/download-xlsx" target="exportFrame" style="display:none">
+  <input type="hidden" name="filename" id="exportFilenameInput">
+  <input type="hidden" name="base64data" id="exportBase64Input">
+</form>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== STATE ===================== */
+let employees = [];
+let kasbonRecords = [];
+let absensiRecords = [];
+let pendapatanRecords = [];
+let cicilanRecords = [];
+let settings = {
+  dendaTidakMasuk:50000, dendaTelatPerJam:5000,
+  jamKerja:{0:9,1:9,2:9,3:9,4:9,5:9,6:9},
+  jamTutup:{0:17,1:17,2:17,3:17,4:17,5:17,6:17}
+};
+let currentTab = 'dashboard';
+let editingKaryawanId = null;
+let editingKasbonId = null;
+let editingCicilanId = null;
+let kasbonFilterEmployee = 'all';
+let selectedAbsensiDate = todayISO();
+let dashboardMonth = currentMonthKey();
+let kasbonMonth = currentMonthKey();
+let pendapatanMonth = currentMonthKey();
+let cicilanMonth = currentMonthKey();
+let slipMonth = currentMonthKey();
+let slipSelectedIds = [];
+let slipPreviewHTML = '';
+let storageOK = true;
+
+const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+/* ===================== HELPERS ===================== */
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayISO(){ const d = new Date(); return d.toISOString().slice(0,10); }
+function currentMonthKey(){ return todayISO().slice(0,7); }
+function formatRupiah(n){
+  n = Number(n)||0;
+  return 'Rp' + n.toLocaleString('id-ID', {maximumFractionDigits:0});
+}
+function formatDateID(iso){
+  if(!iso) return '-';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+}
+function monthLabel(monthKey){
+  const [y,m] = monthKey.split('-');
+  const d = new Date(Number(y), Number(m)-1, 1);
+  return d.toLocaleDateString('id-ID', {month:'long', year:'numeric'});
+}
+function monthDiff(fromKey, toKey){
+  const [fy,fm] = fromKey.split('-').map(Number);
+  const [ty,tm] = toKey.split('-').map(Number);
+  return (ty*12+tm) - (fy*12+fm);
+}
+function empName(id){
+  const e = employees.find(x=>x.id===id);
+  return e ? e.name : '(karyawan dihapus)';
+}
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=> t.classList.remove('show'), 3200);
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function hourOptions(selected){
+  let html = '<option value="">Jam datang</option>';
+  for(let h=0; h<24; h++){
+    const label = String(h).padStart(2,'0') + '.00';
+    const sel = (selected!==null && selected!==undefined && selected!=='' && Number(selected)===h) ? 'selected' : '';
+    html += `<option value="${h}" ${sel}>${label}</option>`;
+  }
+  return html;
+}
+function hourOptionsPlain(selected){
+  let html = '';
+  for(let h=0; h<24; h++){
+    const label = String(h).padStart(2,'0') + '.00';
+    const sel = Number(selected)===h ? 'selected' : '';
+    html += `<option value="${h}" ${sel}>${label}</option>`;
+  }
+  return html;
+}
+function getPendapatanTambahan(empId, monthKey){
+  const r = pendapatanRecords.find(p=>p.employeeId===empId && p.month===monthKey);
+  return r ? (Number(r.amount)||0) : 0;
+}
+function getGajiTetap(empId){
+  const e = employees.find(x=>x.id===empId);
+  return e ? (Number(e.gajiTetap)||0) : 0;
+}
+function cicilanInstallmentForMonth(rec, monthKey){
+  const idx = monthDiff(rec.mulaiBulan, monthKey);
+  if(idx < 0 || idx >= rec.jumlahKali) return 0;
+  const base = Math.round(rec.totalAmount / rec.jumlahKali);
+  if(idx === rec.jumlahKali - 1){
+    return rec.totalAmount - base * (rec.jumlahKali - 1);
+  }
+  return base;
+}
+function cicilanStatusLabel(rec){
+  const idx = monthDiff(rec.mulaiBulan, currentMonthKey());
+  if(idx < 0) return {text:`Belum mulai (${monthLabel(rec.mulaiBulan)})`, cls:'pending'};
+  if(idx >= rec.jumlahKali) return {text:'Lunas', cls:'done'};
+  return {text:`Bulan ke-${idx+1} dari ${rec.jumlahKali}`, cls:'active'};
+}
+function getJamMasukForDate(dateStr){
+  const dow = new Date(dateStr + 'T00:00:00').getDay();
+  const v = settings.jamKerja ? settings.jamKerja[dow] : undefined;
+  return (v===0 || v) ? Number(v) : 9;
+}
+function getJamTutupForDate(dateStr){
+  const dow = new Date(dateStr + 'T00:00:00').getDay();
+  const v = settings.jamTutup ? settings.jamTutup[dow] : undefined;
+  return (v===0 || v) ? Number(v) : 17;
+}
+
+/* ===================== STORAGE ===================== */
+/* Pakai window.storage bila tersedia (mis. saat dibuka sebagai artifact di Claude.ai).
+   Di luar itu — termasuk saat dibungkus jadi APK — window.storage tidak ada,
+   jadi otomatis jatuh ke localStorage bawaan perangkat agar data tidak hilang. */
+const hasClaudeStorage = (typeof window.storage !== 'undefined') && window.storage && typeof window.storage.get === 'function';
+
+async function storageGet(key){
+  if(hasClaudeStorage){
+    return window.storage.get(key, false);
+  }
+  const val = localStorage.getItem('kasbondonk:' + key);
+  return val !== null ? {key, value: val} : null;
+}
+async function storageSet(key, value){
+  if(hasClaudeStorage){
+    return window.storage.set(key, value, false);
+  }
+  localStorage.setItem('kasbondonk:' + key, value);
+  return {key, value};
+}
+
+async function loadAll(){
+  try{
+    const [e,k,a,p,c,s] = await Promise.allSettled([
+      storageGet('employees'),
+      storageGet('kasbon-records'),
+      storageGet('absensi-records'),
+      storageGet('pendapatan-records'),
+      storageGet('cicilan-records'),
+      storageGet('settings')
+    ]);
+    employees = e.status==='fulfilled' && e.value ? JSON.parse(e.value.value) : [];
+    kasbonRecords = k.status==='fulfilled' && k.value ? JSON.parse(k.value.value) : [];
+    absensiRecords = a.status==='fulfilled' && a.value ? JSON.parse(a.value.value) : [];
+    pendapatanRecords = p.status==='fulfilled' && p.value ? JSON.parse(p.value.value) : [];
+    cicilanRecords = c.status==='fulfilled' && c.value ? JSON.parse(c.value.value) : [];
+    if(s.status==='fulfilled' && s.value){
+      const loaded = JSON.parse(s.value.value);
+      settings = {
+        dendaTidakMasuk: loaded.dendaTidakMasuk!==undefined ? loaded.dendaTidakMasuk : 50000,
+        dendaTelatPerJam: loaded.dendaTelatPerJam!==undefined ? loaded.dendaTelatPerJam : 5000,
+        jamKerja: Object.assign({0:9,1:9,2:9,3:9,4:9,5:9,6:9}, loaded.jamKerja||{}),
+        jamTutup: Object.assign({0:17,1:17,2:17,3:17,4:17,5:17,6:17}, loaded.jamTutup||{})
+      };
+    }
+  }catch(err){
+    console.error('Load error', err);
+    storageOK = false;
+  }
+}
+async function saveEmployees(){
+  try{ await storageSet('employees', JSON.stringify(employees)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan data karyawan.'); }
+}
+async function saveKasbon(){
+  try{ await storageSet('kasbon-records', JSON.stringify(kasbonRecords)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan data kasbon.'); }
+}
+async function saveAbsensi(){
+  try{ await storageSet('absensi-records', JSON.stringify(absensiRecords)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan data absensi.'); }
+}
+async function savePendapatan(){
+  try{ await storageSet('pendapatan-records', JSON.stringify(pendapatanRecords)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan data pendapatan.'); }
+}
+async function saveCicilan(){
+  try{ await storageSet('cicilan-records', JSON.stringify(cicilanRecords)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan data cicilan.'); }
+}
+async function saveSettings(){
+  try{ await storageSet('settings', JSON.stringify(settings)); }
+  catch(err){ console.error(err); showToast('Gagal menyimpan pengaturan.'); }
+}
+
+/* ===================== TAB SWITCH ===================== */
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('#tabNav button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  render();
+}
+
+function render(){
+  const el = document.getElementById('panelContent');
+  if(currentTab==='dashboard') el.innerHTML = renderDashboard();
+  else if(currentTab==='karyawan') el.innerHTML = renderKaryawan();
+  else if(currentTab==='kasbon') el.innerHTML = renderKasbon();
+  else if(currentTab==='absensi'){ el.innerHTML = renderAbsensi(); recomputePreview(); }
+  else if(currentTab==='pendapatan') el.innerHTML = renderPendapatan();
+  else if(currentTab==='cicilan') el.innerHTML = renderCicilan();
+  else if(currentTab==='slip') el.innerHTML = renderSlip();
+  else if(currentTab==='pengaturan') el.innerHTML = renderPengaturan();
+}
+
+/* ===================== DASHBOARD ===================== */
+function calcMonthReport(monthKey){
+  const result = {};
+  employees.forEach(e=> result[e.id] = {
+    name:e.name,
+    gajiTetap: getGajiTetap(e.id),
+    pendapatanTambahan: getPendapatanTambahan(e.id, monthKey),
+    kasbon:0, cicilan:0, potongan:0, tambahan:0, potonganTelat:0, tambahanTelat:0
+  });
+
+  kasbonRecords.forEach(k=>{
+    if(k.date && k.date.slice(0,7)===monthKey && result[k.employeeId]){
+      result[k.employeeId].kasbon += Number(k.amount)||0;
+    }
+  });
+
+  cicilanRecords.forEach(c=>{
+    if(result[c.employeeId]){
+      result[c.employeeId].cicilan += cicilanInstallmentForMonth(c, monthKey);
+    }
+  });
+
+  absensiRecords.forEach(a=>{
+    if(!a.date || a.date.slice(0,7)!==monthKey) return;
+    const jamMasuk = getJamMasukForDate(a.date);
+
+    const absentIds = (a.absentIds||[]).filter(id => result[id]);
+    const liburIds = (a.liburIds||[]).filter(id => result[id]);
+    const hadirIds = employees.map(e=>e.id).filter(id => !absentIds.includes(id) && !liburIds.includes(id));
+
+    const pot = settings.dendaTidakMasuk * absentIds.length;
+    absentIds.forEach(id => result[id].potongan += settings.dendaTidakMasuk);
+    if(hadirIds.length > 0 && pot > 0){
+      const share = pot / hadirIds.length;
+      hadirIds.forEach(id => result[id].tambahan += share);
+    }
+
+    const arrivals = a.arrivals || {};
+    const entries = Object.entries(arrivals).filter(([id,h]) =>
+      result[id] && hadirIds.includes(id) && h!==null && h!==undefined && h!==''
+    );
+    if(entries.length > 0){
+      const minHour = Math.min(...entries.map(([,h]) => Number(h)));
+      const earliestIds = entries.filter(([,h]) => Number(h)===minHour).map(([id]) => id);
+      let telatPool = 0;
+      entries.forEach(([id,h]) => {
+        const hour = Number(h);
+        if(hour > jamMasuk){
+          const denda = settings.dendaTelatPerJam * (hour - jamMasuk);
+          result[id].potonganTelat += denda;
+          telatPool += denda;
+        }
+      });
+      if(telatPool > 0 && earliestIds.length > 0){
+        const shareTelat = telatPool / earliestIds.length;
+        earliestIds.forEach(id => result[id].tambahanTelat += shareTelat);
+      }
+    }
+  });
+
+  return result;
+}
+
+function renderDashboard(){
+  const report = calcMonthReport(dashboardMonth);
+  const rows = Object.values(report).sort((a,b)=> a.name.localeCompare(b.name));
+
+  let totalPendapatan=0, totalKasbon=0, totalCicilan=0, totalPotongan=0, totalTambahan=0, totalSaldo=0;
+  rows.forEach(r=>{
+    const pendapatan = r.gajiTetap + r.pendapatanTambahan;
+    const potonganAll = r.potongan + r.potonganTelat;
+    const tambahanAll = r.tambahan + r.tambahanTelat;
+    const saldo = pendapatan - r.kasbon - r.cicilan - potonganAll + tambahanAll;
+    totalPendapatan += pendapatan; totalKasbon += r.kasbon; totalCicilan += r.cicilan;
+    totalPotongan += potonganAll; totalTambahan += tambahanAll; totalSaldo += saldo;
+  });
+
+  let body = '';
+  if(employees.length === 0){
+    body = `<div class="empty-state"><div class="big">📖</div>Belum ada karyawan.<br>Tambahkan karyawan dulu di tab <b>Karyawan</b>.</div>`;
+  } else {
+    body = `
+    <div class="summary-cards">
+      <div class="scard blue"><div class="label">Total Pendapatan</div><div class="value">${formatRupiah(totalPendapatan)}</div></div>
+      <div class="scard green"><div class="label">Total Kasbon</div><div class="value">${formatRupiah(totalKasbon)}</div></div>
+      <div class="scard purple"><div class="label">Total Cicilan</div><div class="value">${formatRupiah(totalCicilan)}</div></div>
+      <div class="scard red"><div class="label">Total Potongan</div><div class="value">${formatRupiah(totalPotongan)}</div></div>
+      <div class="scard gold"><div class="label">Total Tambahan</div><div class="value">${formatRupiah(totalTambahan)}</div></div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Karyawan</th>
+          <th class="right">Pendapatan</th>
+          <th class="right">Kasbon</th>
+          <th class="right">Cicilan</th>
+          <th class="right">Potongan</th>
+          <th class="right">Tambahan</th>
+          <th class="right">Saldo</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(r=>{
+            const pendapatan = r.gajiTetap + r.pendapatanTambahan;
+            const potonganAll = r.potongan + r.potonganTelat;
+            const tambahanAll = r.tambahan + r.tambahanTelat;
+            const saldo = pendapatan - r.kasbon - r.cicilan - potonganAll + tambahanAll;
+            const pendTitle = `Bagi Hasil: ${formatRupiah(r.pendapatanTambahan)} • Gaji Tetap: ${formatRupiah(r.gajiTetap)}`;
+            const potTitle = `Absensi: ${formatRupiah(r.potongan)} • Telat: ${formatRupiah(r.potonganTelat)}`;
+            const tamTitle = `Absensi: ${formatRupiah(r.tambahan)} • Telat: ${formatRupiah(r.tambahanTelat)}`;
+            return `<tr>
+              <td>${escapeHtml(r.name)}</td>
+              <td class="right num" title="${pendTitle}">${formatRupiah(pendapatan)}</td>
+              <td class="right num">${formatRupiah(r.kasbon)}</td>
+              <td class="right num">${formatRupiah(r.cicilan)}</td>
+              <td class="right num" style="color:var(--red)" title="${potTitle}">${potonganAll>0?'-':''}${formatRupiah(potonganAll)}</td>
+              <td class="right num" style="color:var(--green)" title="${tamTitle}">${tambahanAll>0?'+':''}${formatRupiah(tambahanAll)}</td>
+              <td class="right num" style="font-weight:600">${formatRupiah(saldo)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+      <div class="stamp">
+        <div class="stamp-label">Total Saldo ${escapeHtml(monthLabel(dashboardMonth))}</div>
+        <div class="stamp-value">${formatRupiah(totalSaldo)}</div>
+      </div>
+    </div>
+    <div class="note-box">
+      <b>Cara baca:</b> Saldo = Pendapatan − Kasbon − Cicilan − Potongan + Tambahan.<br>
+      Pendapatan = gaji tetap bulanan (jika diaktifkan di tab Karyawan) + pendapatan tambahan di tab Pendapatan.<br>
+      Cicilan = angsuran bulan berjalan dari pinjaman di tab Cicilan.<br>
+      Potongan = ${formatRupiah(settings.dendaTidakMasuk)} saat tidak masuk + ${formatRupiah(settings.dendaTelatPerJam)}/jam saat telat (jam kerja tiap hari diatur di tab Pengaturan). Status <b>Libur</b> tidak dikenakan potongan.<br>
+      Tambahan = bagian dari denda tidak-masuk (dibagi ke yang hadir) + seluruh denda telat (untuk yang datang paling awal).<br>
+      Arahkan kursor ke kolom Pendapatan/Potongan/Tambahan untuk melihat rinciannya. Butuh slip per karyawan? Buka tab <b>Slip</b>.
+    </div>`;
+  }
+
+  return `
+    <h2 class="section-title">Laporan Bulanan</h2>
+    <p class="section-sub">Ringkasan pendapatan, kasbon, cicilan, potongan, dan tambahan tiap karyawan.</p>
+    <div class="month-picker">
+      <label>BULAN</label>
+      <input type="month" value="${dashboardMonth}" onchange="dashboardMonth=this.value; render();">
+    </div>
+    ${body}
+  `;
+}
+
+/* ===================== KARYAWAN ===================== */
+function renderKaryawan(){
+  const editing = employees.find(e=>e.id===editingKaryawanId);
+  return `
+    <h2 class="section-title">Data Karyawan</h2>
+    <p class="section-sub">Tambah, ubah, atau hapus nama karyawan. Aktifkan gaji tetap bila karyawan menerima gaji bulanan tetap.</p>
+
+    <div class="form-row">
+      <div class="field">
+        <label>${editing ? 'Ubah Nama' : 'Nama Karyawan'}</label>
+        <input id="karyawanNama" type="text" placeholder="Contoh: Budi Santoso" value="${editing ? escapeHtml(editing.name) : ''}" style="min-width:200px;">
+      </div>
+      <div class="field">
+        <label>Gaji Tetap Bulanan (Rp)</label>
+        <input id="karyawanGajiTetap" class="num-input" type="number" min="0" step="1000" placeholder="0 = tidak ada" value="${editing && editing.gajiTetap ? editing.gajiTetap : ''}" style="min-width:170px;">
+        <span class="hint">Kosongkan / 0 jika tidak bergaji tetap</span>
+      </div>
+      <button class="btn btn-primary" onclick="submitKaryawan()">${editing ? 'Simpan Perubahan' : '+ Tambah Karyawan'}</button>
+      ${editing ? `<span class="cancel-edit" onclick="editingKaryawanId=null; render();">Batal</span>` : ''}
+    </div>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">🧑‍💼</div>Belum ada karyawan yang tercatat.</div>
+    ` : `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nama</th><th class="right">Gaji Tetap</th><th class="right">Aksi</th></tr></thead>
+        <tbody>
+          ${employees.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`
+            <tr>
+              <td>${escapeHtml(e.name)}</td>
+              <td class="right num">${e.gajiTetap ? formatRupiah(e.gajiTetap) : '<span style="color:var(--ink-soft)">-</span>'}</td>
+              <td class="right"><div class="actions-cell">
+                <button class="btn-edit btn-sm" onclick="editingKaryawanId='${e.id}'; render();">Ubah</button>
+                <button class="btn-danger btn-sm" onclick="deleteKaryawan('${e.id}')">Hapus</button>
+              </div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    `}
+  `;
+}
+
+async function submitKaryawan(){
+  const input = document.getElementById('karyawanNama');
+  const name = input.value.trim();
+  const gajiTetap = Number(document.getElementById('karyawanGajiTetap').value) || 0;
+  if(!name){ showToast('Nama karyawan tidak boleh kosong.'); return; }
+
+  if(editingKaryawanId){
+    const emp = employees.find(e=>e.id===editingKaryawanId);
+    if(emp){ emp.name = name; emp.gajiTetap = gajiTetap; }
+    editingKaryawanId = null;
+  } else {
+    employees.push({id: uid(), name, gajiTetap});
+  }
+  await saveEmployees();
+  render();
+  showToast('Data karyawan disimpan.');
+}
+
+async function deleteKaryawan(id){
+  const emp = employees.find(e=>e.id===id);
+  if(!emp) return;
+  const hasRecords = kasbonRecords.some(k=>k.employeeId===id)
+    || absensiRecords.some(a=>(a.absentIds||[]).includes(id) || (a.liburIds||[]).includes(id) || (a.arrivals && a.arrivals[id]!==undefined))
+    || pendapatanRecords.some(p=>p.employeeId===id)
+    || cicilanRecords.some(c=>c.employeeId===id);
+  const msg = hasRecords
+    ? `Hapus "${emp.name}"? Riwayat kasbon, absensi, pendapatan, dan cicilan karyawan ini juga akan dihapus.`
+    : `Hapus "${emp.name}"?`;
+  if(!confirm(msg)) return;
+
+  employees = employees.filter(e=>e.id!==id);
+  kasbonRecords = kasbonRecords.filter(k=>k.employeeId!==id);
+  absensiRecords = absensiRecords.map(a=>{
+    const arrivals = {...(a.arrivals||{})};
+    delete arrivals[id];
+    return {
+      ...a,
+      absentIds:(a.absentIds||[]).filter(x=>x!==id),
+      liburIds:(a.liburIds||[]).filter(x=>x!==id),
+      arrivals
+    };
+  });
+  pendapatanRecords = pendapatanRecords.filter(p=>p.employeeId!==id);
+  cicilanRecords = cicilanRecords.filter(c=>c.employeeId!==id);
+  if(kasbonFilterEmployee===id) kasbonFilterEmployee='all';
+  slipSelectedIds = slipSelectedIds.filter(x=>x!==id);
+
+  await Promise.all([saveEmployees(), saveKasbon(), saveAbsensi(), savePendapatan(), saveCicilan()]);
+  render();
+  showToast('Karyawan dihapus.');
+}
+
+/* ===================== KASBON ===================== */
+function renderKasbon(){
+  const editing = kasbonRecords.find(k=>k.id===editingKasbonId);
+
+  const listForMonth = kasbonRecords
+    .filter(k=>k.date && k.date.slice(0,7)===kasbonMonth)
+    .filter(k=> kasbonFilterEmployee==='all' || k.employeeId===kasbonFilterEmployee)
+    .slice()
+    .sort((a,b)=> b.date.localeCompare(a.date));
+
+  const monthTotal = listForMonth.reduce((s,k)=> s + (Number(k.amount)||0), 0);
+
+  const empOptions = employees.map(e=>`<option value="${e.id}" ${editing && editing.employeeId===e.id ? 'selected':''}>${escapeHtml(e.name)}</option>`).join('');
+  const filterOptions = `<option value="all" ${kasbonFilterEmployee==='all'?'selected':''}>Semua Karyawan</option>` +
+    employees.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`<option value="${e.id}" ${kasbonFilterEmployee===e.id?'selected':''}>${escapeHtml(e.name)}</option>`).join('');
+
+  const filterLabel = kasbonFilterEmployee==='all' ? 'Semua Karyawan' : escapeHtml(empName(kasbonFilterEmployee));
+
+  return `
+    <h2 class="section-title">Catatan Kasbon</h2>
+    <p class="section-sub">Tanggal terisi otomatis, bisa diubah bila mencatat kasbon lama.</p>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">👤</div>Tambahkan karyawan dulu sebelum mencatat kasbon.</div>
+    ` : `
+    <div class="form-row">
+      <div class="field">
+        <label>Karyawan</label>
+        <select id="kasbonKaryawan" style="min-width:170px;">${empOptions}</select>
+      </div>
+      <div class="field">
+        <label>Jumlah (Rp)</label>
+        <input id="kasbonJumlah" class="num-input" type="number" min="0" step="1000" placeholder="0" value="${editing ? editing.amount : ''}">
+      </div>
+      <div class="field">
+        <label>Tanggal</label>
+        <input id="kasbonTanggal" type="date" value="${editing ? editing.date : todayISO()}">
+      </div>
+      <div class="field">
+        <label>Catatan (opsional)</label>
+        <input id="kasbonCatatan" type="text" placeholder="mis. keperluan sekolah" value="${editing ? escapeHtml(editing.note||'') : ''}" style="min-width:180px;">
+      </div>
+      <button class="btn btn-primary" onclick="submitKasbon()">${editing ? 'Simpan Perubahan' : '+ Tambah Kasbon'}</button>
+      ${editing ? `<span class="cancel-edit" onclick="editingKasbonId=null; render();">Batal</span>` : ''}
+    </div>
+    `}
+
+    <div class="month-picker">
+      <label>BULAN</label>
+      <input type="month" value="${kasbonMonth}" onchange="kasbonMonth=this.value; render();">
+      <label>KARYAWAN</label>
+      <select onchange="kasbonFilterEmployee=this.value; render();">${filterOptions}</select>
+    </div>
+
+    <div class="summary-cards">
+      <div class="scard green"><div class="label">Total Kasbon ${escapeHtml(monthLabel(kasbonMonth))} — ${filterLabel}</div><div class="value">${formatRupiah(monthTotal)}</div></div>
+    </div>
+
+    ${listForMonth.length === 0 ? `
+      <div class="empty-state"><div class="big">💵</div>Belum ada kasbon untuk filter ini.</div>
+    ` : `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Tanggal</th><th>Karyawan</th><th class="right">Jumlah</th><th>Catatan</th><th class="right">Aksi</th>
+        </tr></thead>
+        <tbody>
+          ${listForMonth.map(k=>`
+            <tr>
+              <td class="num">${formatDateID(k.date)}</td>
+              <td>${escapeHtml(empName(k.employeeId))}</td>
+              <td class="right num">${formatRupiah(k.amount)}</td>
+              <td>${escapeHtml(k.note||'-')}</td>
+              <td class="right"><div class="actions-cell">
+                <button class="btn-edit btn-sm" onclick="editingKasbonId='${k.id}'; render();">Ubah</button>
+                <button class="btn-danger btn-sm" onclick="deleteKasbon('${k.id}')">Hapus</button>
+              </div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    `}
+  `;
+}
+
+async function submitKasbon(){
+  const empId = document.getElementById('kasbonKaryawan').value;
+  const amount = Number(document.getElementById('kasbonJumlah').value);
+  const date = document.getElementById('kasbonTanggal').value || todayISO();
+  const note = document.getElementById('kasbonCatatan').value.trim();
+
+  if(!empId){ showToast('Pilih karyawan terlebih dahulu.'); return; }
+  if(!amount || amount <= 0){ showToast('Jumlah kasbon harus lebih dari 0.'); return; }
+
+  if(editingKasbonId){
+    const rec = kasbonRecords.find(k=>k.id===editingKasbonId);
+    if(rec){ rec.employeeId=empId; rec.amount=amount; rec.date=date; rec.note=note; }
+    editingKasbonId = null;
+  } else {
+    kasbonRecords.push({id: uid(), employeeId: empId, amount, date, note});
+  }
+  await saveKasbon();
+  render();
+  showToast('Kasbon disimpan.');
+}
+
+async function deleteKasbon(id){
+  if(!confirm('Hapus catatan kasbon ini?')) return;
+  kasbonRecords = kasbonRecords.filter(k=>k.id!==id);
+  await saveKasbon();
+  render();
+  showToast('Kasbon dihapus.');
+}
+
+/* ===================== ABSENSI ===================== */
+function getDayStatus(record, empId){
+  if(record && (record.absentIds||[]).includes(empId)) return 'absen';
+  if(record && (record.liburIds||[]).includes(empId)) return 'libur';
+  return 'hadir';
+}
+
+function renderAbsensi(){
+  const record = absensiRecords.find(a=>a.date===selectedAbsensiDate);
+  const arrivals = record ? (record.arrivals||{}) : {};
+  const jamMasuk = getJamMasukForDate(selectedAbsensiDate);
+  const jamTutup = getJamTutupForDate(selectedAbsensiDate);
+  const dow = new Date(selectedAbsensiDate + 'T00:00:00').getDay();
+
+  const history = absensiRecords
+    .filter(a=> (a.absentIds||[]).length > 0 || (a.liburIds||[]).length > 0 || Object.keys(a.arrivals||{}).length > 0)
+    .slice()
+    .sort((a,b)=> b.date.localeCompare(a.date))
+    .slice(0,15);
+
+  return `
+    <h2 class="section-title">Absensi & Potongan</h2>
+    <p class="section-sub">Atur status tiap karyawan hari ini: Hadir, Tidak Masuk (kena potongan), atau Libur (tidak kena potongan).</p>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">👤</div>Tambahkan karyawan dulu sebelum mencatat absensi.</div>
+    ` : `
+    <div class="month-picker">
+      <label>TANGGAL</label>
+      <input type="date" value="${selectedAbsensiDate}" onchange="selectedAbsensiDate=this.value; render();">
+      <span class="hint">Jam kerja ${DAY_NAMES[dow]}: <b class="num">${String(jamMasuk).padStart(2,'0')}.00–${String(jamTutup).padStart(2,'0')}.00</b> (atur di tab Pengaturan)</span>
+    </div>
+
+    <div class="checklist">
+      ${employees.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>{
+        const status = getDayStatus(record, e.id);
+        const arrival = arrivals[e.id];
+        return `
+        <div class="check-row" data-emp="${e.id}">
+          <label class="emp-name">${escapeHtml(e.name)}</label>
+          <select id="status_${e.id}" class="status-select" onchange="recomputePreview()">
+            <option value="hadir" ${status==='hadir'?'selected':''}>Hadir</option>
+            <option value="absen" ${status==='absen'?'selected':''}>Tidak Masuk</option>
+            <option value="libur" ${status==='libur'?'selected':''}>Libur</option>
+          </select>
+          <select id="jam_${e.id}" ${status!=='hadir'?'disabled':''} onchange="recomputePreview()">
+            ${hourOptions(arrival)}
+          </select>
+          <span class="tag ${status}" id="tag_${e.id}">${status==='absen'?'Tidak masuk':(status==='libur'?'Libur':'Hadir')}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="preview-box" id="previewBox"></div>
+
+    <div class="form-row" style="margin-bottom:0;">
+      <button class="btn btn-primary" onclick="saveAbsensiForDate()">Simpan Absensi ${formatDateID(selectedAbsensiDate)}</button>
+      ${record ? `<button class="btn btn-ghost" onclick="deleteAbsensiForDate()">Hapus Data Hari Ini</button>` : ''}
+    </div>
+
+    <div class="note-box">
+      Status <b>Tidak Masuk</b> dikenakan potongan ${formatRupiah(settings.dendaTidakMasuk)} yang dibagi rata ke karyawan yang hadir. Status <b>Libur</b> tidak dikenakan potongan apapun.
+      Telat dari jam masuk normal hari itu dikenakan potongan ${formatRupiah(settings.dendaTelatPerJam)}/jam, seluruhnya diberikan ke karyawan yang datang paling awal.
+      Jika karyawan berstatus Hadir tapi jam datangnya belum diisi, sistem akan memberi peringatan.
+    </div>
+
+    <div class="history-list">
+      <div style="font-size:13px; color:var(--ink-soft); margin-bottom:10px;">Riwayat Absensi Terakhir</div>
+      ${history.length === 0 ? `<div style="font-size:13.5px;color:var(--ink-soft);">Belum ada riwayat.</div>` : history.map(h=>{
+        const nAbsen = (h.absentIds||[]).filter(id=>employees.some(e=>e.id===id)).length;
+        const nLibur = (h.liburIds||[]).filter(id=>employees.some(e=>e.id===id)).length;
+        return `<div class="hist-item" onclick="selectedAbsensiDate='${h.date}'; render();">
+          <span class="d">${formatDateID(h.date)}</span>
+          <span>${nAbsen} tidak masuk${nLibur>0 ? ' • '+nLibur+' libur' : ''}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    `}
+  `;
+}
+
+function renderPreviewText(p){
+  let html = '';
+  if(p.noJamNames && p.noJamNames.length > 0){
+    html += `<span class="warn-line">⚠️ ${p.noJamNames.length} karyawan hadir belum diisi jam datang: ${p.noJamNames.join(', ')}.</span>`;
+  }
+  if(p.absentCount===0){
+    html += `Belum ada karyawan yang ditandai tidak masuk.<br>`;
+  } else if(p.hadirCount===0){
+    html += `<b>${p.absentCount} karyawan</b> tidak masuk (potongan ${formatRupiah(p.pot)}), tidak ada karyawan hadir untuk menerima pembagian.<br>`;
+  } else {
+    html += `<b>${p.absentCount} karyawan</b> tidak masuk → potongan ${formatRupiah(settings.dendaTidakMasuk)} × ${p.absentCount} = <b>${formatRupiah(p.pot)}</b>, dibagi ke <b>${p.hadirCount} karyawan hadir</b> = <b>${formatRupiah(p.share)}</b>/orang.<br>`;
+  }
+  if(p.liburCount > 0){
+    html += `<b>${p.liburCount} karyawan</b> libur — tidak kena potongan dan tidak ikut pembagian.<br>`;
+  }
+  if(p.telatCount===0){
+    html += `Belum ada jam datang yang menunjukkan keterlambatan.`;
+  } else if(p.earliestNames.length===0){
+    html += `<b>${p.telatCount} karyawan</b> telat, total potongan telat <b>${formatRupiah(p.telatPool)}</b>.`;
+  } else {
+    html += `<b>${p.telatCount} karyawan</b> telat → total potongan telat <b>${formatRupiah(p.telatPool)}</b>, diberikan ke <b>${p.earliestNames.join(', ')}</b> (datang paling awal).`;
+  }
+  return html;
+}
+
+function recomputePreview(){
+  const previewBox = document.getElementById('previewBox');
+  if(!previewBox) return;
+
+  const jamMasuk = getJamMasukForDate(selectedAbsensiDate);
+  let absentCount = 0, liburCount = 0;
+  const arrivalsPreview = [];
+  const noJamNames = [];
+
+  employees.forEach(e=>{
+    const statusSel = document.getElementById('status_'+e.id);
+    const jamSel = document.getElementById('jam_'+e.id);
+    const tag = document.getElementById('tag_'+e.id);
+    if(!statusSel) return;
+    const status = statusSel.value;
+
+    if(jamSel) jamSel.disabled = (status !== 'hadir');
+
+    if(status === 'absen'){
+      absentCount++;
+      if(tag){ tag.textContent='Tidak masuk'; tag.className='tag absen'; }
+    } else if(status === 'libur'){
+      liburCount++;
+      if(tag){ tag.textContent='Libur'; tag.className='tag libur'; }
+    } else {
+      if(tag){ tag.textContent='Hadir'; tag.className='tag hadir'; }
+      if(jamSel && jamSel.value !== ''){
+        arrivalsPreview.push({id:e.id, name:e.name, hour:Number(jamSel.value)});
+      } else {
+        noJamNames.push(e.name);
+      }
+    }
+  });
+
+  let telatCount = 0, telatPool = 0, earliestNames = [];
+  if(arrivalsPreview.length > 0){
+    const minHour = Math.min(...arrivalsPreview.map(a=>a.hour));
+    earliestNames = arrivalsPreview.filter(a=>a.hour===minHour).map(a=>a.name);
+  }
+  arrivalsPreview.forEach(a=>{
+    if(a.hour > jamMasuk){
+      telatCount++;
+      telatPool += settings.dendaTelatPerJam * (a.hour - jamMasuk);
+    }
+  });
+
+  const hadirCount = employees.length - absentCount - liburCount;
+  const pot = settings.dendaTidakMasuk * absentCount;
+  const share = hadirCount > 0 ? pot / hadirCount : 0;
+
+  previewBox.innerHTML = renderPreviewText({absentCount, liburCount, hadirCount, pot, share, telatCount, telatPool, earliestNames, noJamNames});
+}
+
+async function saveAbsensiForDate(){
+  const absentIds = [];
+  const liburIds = [];
+  const arrivals = {};
+  const noJamNames = [];
+
+  employees.forEach(e=>{
+    const statusSel = document.getElementById('status_'+e.id);
+    const jamSel = document.getElementById('jam_'+e.id);
+    if(!statusSel) return;
+    const status = statusSel.value;
+    if(status === 'absen'){
+      absentIds.push(e.id);
+    } else if(status === 'libur'){
+      liburIds.push(e.id);
+    } else if(jamSel && jamSel.value !== ''){
+      arrivals[e.id] = Number(jamSel.value);
+    } else {
+      noJamNames.push(e.name);
+    }
+  });
+
+  if(noJamNames.length > 0){
+    const ok = confirm(`${noJamNames.length} karyawan hadir belum diisi jam datang (${noJamNames.join(', ')}).\n\nTetap simpan tanpa jam datang untuk mereka?`);
+    if(!ok) return;
+  }
+
+  const idx = absensiRecords.findIndex(a=>a.date===selectedAbsensiDate);
+  const hasData = absentIds.length > 0 || liburIds.length > 0 || Object.keys(arrivals).length > 0;
+
+  if(!hasData){
+    if(idx>=0) absensiRecords.splice(idx,1);
+  } else if(idx>=0){
+    absensiRecords[idx].absentIds = absentIds;
+    absensiRecords[idx].liburIds = liburIds;
+    absensiRecords[idx].arrivals = arrivals;
+  } else {
+    absensiRecords.push({id: uid(), date: selectedAbsensiDate, absentIds, liburIds, arrivals});
+  }
+  await saveAbsensi();
+  render();
+  showToast('Absensi disimpan.');
+}
+
+async function deleteAbsensiForDate(){
+  if(!confirm('Hapus data absensi tanggal ini?')) return;
+  absensiRecords = absensiRecords.filter(a=>a.date!==selectedAbsensiDate);
+  await saveAbsensi();
+  render();
+  showToast('Data absensi dihapus.');
+}
+
+/* ===================== PENDAPATAN ===================== */
+function renderPendapatan(){
+  return `
+    <h2 class="section-title">Pendapatan Karyawan</h2>
+    <p class="section-sub">Gaji tetap (diatur di tab Karyawan) otomatis masuk tiap bulan. Di sini tambahkan bagi hasil/bonus bila ada.</p>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">👤</div>Tambahkan karyawan dulu sebelum mengisi pendapatan.</div>
+    ` : `
+    <div class="month-picker">
+      <label>BULAN</label>
+      <input type="month" value="${pendapatanMonth}" onchange="pendapatanMonth=this.value; render();">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Karyawan</th><th class="right">Gaji Tetap</th><th class="right">Bagi Hasil (Rp)</th><th class="right">Total</th><th class="right">Aksi</th></tr></thead>
+        <tbody>
+          ${employees.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>{
+            const gajiTetap = getGajiTetap(e.id);
+            const val = getPendapatanTambahan(e.id, pendapatanMonth);
+            return `<tr>
+              <td>${escapeHtml(e.name)}</td>
+              <td class="right num">${gajiTetap ? formatRupiah(gajiTetap) : '-'}</td>
+              <td class="right"><input class="num-input" type="number" min="0" step="1000" id="pend_${e.id}" value="${val||''}" placeholder="0" style="width:140px; text-align:right;"></td>
+              <td class="right num" style="font-weight:600">${formatRupiah(gajiTetap+val)}</td>
+              <td class="right"><button class="btn-edit btn-sm" onclick="submitPendapatan('${e.id}')">Simpan</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    `}
+  `;
+}
+
+async function submitPendapatan(empId){
+  const input = document.getElementById('pend_'+empId);
+  if(!input) return;
+  const amount = Number(input.value) || 0;
+  const idx = pendapatanRecords.findIndex(p=>p.employeeId===empId && p.month===pendapatanMonth);
+  if(idx>=0){ pendapatanRecords[idx].amount = amount; }
+  else{ pendapatanRecords.push({id: uid(), employeeId: empId, month: pendapatanMonth, amount}); }
+  await savePendapatan();
+  showToast('Pendapatan disimpan.');
+}
+
+/* ===================== CICILAN ===================== */
+function renderCicilan(){
+  const editing = cicilanRecords.find(c=>c.id===editingCicilanId);
+  const empOptions = employees.map(e=>`<option value="${e.id}" ${editing && editing.employeeId===e.id ? 'selected':''}>${escapeHtml(e.name)}</option>`).join('');
+
+  const report = calcMonthReport(cicilanMonth);
+  const totalCicilanBulanIni = Object.values(report).reduce((s,r)=> s + r.cicilan, 0);
+
+  const list = cicilanRecords.slice().sort((a,b)=> b.mulaiBulan.localeCompare(a.mulaiBulan));
+
+  return `
+    <h2 class="section-title">Cicilan Karyawan</h2>
+    <p class="section-sub">Atur pinjaman yang diajukan karyawan dan berapa kali dicicil tiap bulan. Angsuran otomatis dipotong dari saldo tiap bulan berjalan.</p>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">👤</div>Tambahkan karyawan dulu sebelum mengatur cicilan.</div>
+    ` : `
+    <div class="form-row">
+      <div class="field">
+        <label>Karyawan</label>
+        <select id="cicilanKaryawan" style="min-width:170px;">${empOptions}</select>
+      </div>
+      <div class="field">
+        <label>Besar Cicilan Diajukan (Rp)</label>
+        <input id="cicilanTotal" class="num-input" type="number" min="0" step="1000" placeholder="0" value="${editing ? editing.totalAmount : ''}">
+      </div>
+      <div class="field">
+        <label>Jumlah Kali Pembayaran</label>
+        <input id="cicilanKali" class="num-input" type="number" min="1" step="1" placeholder="mis. 6" value="${editing ? editing.jumlahKali : ''}" style="min-width:110px;">
+      </div>
+      <div class="field">
+        <label>Mulai Bulan</label>
+        <input id="cicilanMulai" type="month" value="${editing ? editing.mulaiBulan : currentMonthKey()}">
+      </div>
+      <div class="field">
+        <label>Catatan (opsional)</label>
+        <input id="cicilanCatatan" type="text" placeholder="mis. pinjaman motor" value="${editing ? escapeHtml(editing.catatan||'') : ''}" style="min-width:160px;">
+      </div>
+      <button class="btn btn-primary" onclick="submitCicilan()">${editing ? 'Simpan Perubahan' : '+ Tambah Cicilan'}</button>
+      ${editing ? `<span class="cancel-edit" onclick="editingCicilanId=null; render();">Batal</span>` : ''}
+    </div>
+
+    <div class="month-picker">
+      <label>LIHAT ANGSURAN BULAN</label>
+      <input type="month" value="${cicilanMonth}" onchange="cicilanMonth=this.value; render();">
+    </div>
+    <div class="summary-cards">
+      <div class="scard purple"><div class="label">Total Angsuran ${escapeHtml(monthLabel(cicilanMonth))}</div><div class="value">${formatRupiah(totalCicilanBulanIni)}</div></div>
+    </div>
+
+    ${list.length === 0 ? `
+      <div class="empty-state"><div class="big">🧾</div>Belum ada data cicilan.</div>
+    ` : `
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Karyawan</th><th class="right">Total</th><th class="right">Per Bulan</th><th>Mulai</th><th>Status</th><th>Catatan</th><th class="right">Aksi</th>
+        </tr></thead>
+        <tbody>
+          ${list.map(c=>{
+            const perBulan = Math.round(c.totalAmount / c.jumlahKali);
+            const status = cicilanStatusLabel(c);
+            return `<tr>
+              <td>${escapeHtml(empName(c.employeeId))}</td>
+              <td class="right num">${formatRupiah(c.totalAmount)}</td>
+              <td class="right num">${formatRupiah(perBulan)} × ${c.jumlahKali}</td>
+              <td class="num">${escapeHtml(monthLabel(c.mulaiBulan))}</td>
+              <td><span class="status-pill ${status.cls}">${status.text}</span></td>
+              <td>${escapeHtml(c.catatan||'-')}</td>
+              <td class="right"><div class="actions-cell">
+                <button class="btn-edit btn-sm" onclick="editingCicilanId='${c.id}'; render();">Ubah</button>
+                <button class="btn-danger btn-sm" onclick="deleteCicilan('${c.id}')">Hapus</button>
+              </div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    `}
+    `}
+  `;
+}
+
+async function submitCicilan(){
+  const empId = document.getElementById('cicilanKaryawan').value;
+  const totalAmount = Number(document.getElementById('cicilanTotal').value);
+  const jumlahKali = Math.floor(Number(document.getElementById('cicilanKali').value));
+  const mulaiBulan = document.getElementById('cicilanMulai').value || currentMonthKey();
+  const catatan = document.getElementById('cicilanCatatan').value.trim();
+
+  if(!empId){ showToast('Pilih karyawan terlebih dahulu.'); return; }
+  if(!totalAmount || totalAmount <= 0){ showToast('Besar cicilan harus lebih dari 0.'); return; }
+  if(!jumlahKali || jumlahKali <= 0){ showToast('Jumlah kali pembayaran harus lebih dari 0.'); return; }
+
+  if(editingCicilanId){
+    const rec = cicilanRecords.find(c=>c.id===editingCicilanId);
+    if(rec){ rec.employeeId=empId; rec.totalAmount=totalAmount; rec.jumlahKali=jumlahKali; rec.mulaiBulan=mulaiBulan; rec.catatan=catatan; }
+    editingCicilanId = null;
+  } else {
+    cicilanRecords.push({id: uid(), employeeId: empId, totalAmount, jumlahKali, mulaiBulan, catatan});
+  }
+  await saveCicilan();
+  render();
+  showToast('Cicilan disimpan.');
+}
+
+async function deleteCicilan(id){
+  if(!confirm('Hapus data cicilan ini?')) return;
+  cicilanRecords = cicilanRecords.filter(c=>c.id!==id);
+  await saveCicilan();
+  render();
+  showToast('Cicilan dihapus.');
+}
+
+/* ===================== SLIP PEMBUKUAN ===================== */
+function renderSlip(){
+  return `
+    <h2 class="section-title">Slip Pembukuan Karyawan</h2>
+    <p class="section-sub">Pilih karyawan dan bulan, lalu tampilkan slip untuk dicetak atau disimpan sebagai PDF.</p>
+
+    ${employees.length === 0 ? `
+      <div class="empty-state"><div class="big">👤</div>Tambahkan karyawan dulu sebelum membuat slip.</div>
+    ` : `
+    <div class="month-picker">
+      <label>BULAN</label>
+      <input type="month" value="${slipMonth}" onchange="slipMonth=this.value;">
+    </div>
+
+    <div class="slip-select-actions">
+      <button class="btn-ghost btn-sm" onclick="slipSelectAll()">Pilih Semua</button>
+      <button class="btn-ghost btn-sm" onclick="slipClearAll()">Batal Semua</button>
+    </div>
+
+    <div class="checklist">
+      ${employees.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(e=>`
+        <div class="check-row">
+          <input type="checkbox" id="slipchk_${e.id}" ${slipSelectedIds.includes(e.id)?'checked':''}>
+          <label class="emp-name" for="slipchk_${e.id}">${escapeHtml(e.name)}</label>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="form-row">
+      <button class="btn btn-primary" onclick="generateSlips()">Tampilkan Slip</button>
+      <button class="btn btn-ghost" onclick="printSlips()">🖨️ Cetak / Simpan PDF</button>
+    </div>
+
+    <div id="slipPrintArea">${slipPreviewHTML}</div>
+    `}
+  `;
+}
+
+function slipSelectAll(){
+  employees.forEach(e=>{
+    const chk = document.getElementById('slipchk_'+e.id);
+    if(chk) chk.checked = true;
+  });
+}
+function slipClearAll(){
+  employees.forEach(e=>{
+    const chk = document.getElementById('slipchk_'+e.id);
+    if(chk) chk.checked = false;
+  });
+}
+
+function buildSlipHTML(empId, monthKey, report){
+  const r = report[empId];
+  if(!r) return '';
+  const pendapatan = r.gajiTetap + r.pendapatanTambahan;
+  const potonganAll = r.potongan + r.potonganTelat;
+  const tambahanAll = r.tambahan + r.tambahanTelat;
+  const totalPotonganBaris = r.kasbon + r.cicilan + potonganAll;
+  const saldo = pendapatan - r.kasbon - r.cicilan - potonganAll + tambahanAll;
+
+  return `
+  <div class="slip-sheet">
+    <div class="slip-header">
+      <div class="slip-brand">Kasbon<span>Donk</span></div>
+      <div class="slip-title">Slip Pembukuan Karyawan</div>
+    </div>
+    <div class="slip-meta">
+      <div><span>Nama Karyawan</span><b>${escapeHtml(r.name)}</b></div>
+      <div><span>Periode</span><b>${escapeHtml(monthLabel(monthKey))}</b></div>
+      <div><span>Tanggal Cetak</span><b>${formatDateID(todayISO())}</b></div>
+    </div>
+    <table class="slip-table">
+      <tr class="slip-section"><td colspan="2">Pendapatan</td></tr>
+      <tr><td>Bagi Hasil</td><td class="right num">${formatRupiah(r.pendapatanTambahan)}</td></tr>
+      <tr><td>Gaji Tetap</td><td class="right num">${formatRupiah(r.gajiTetap)}</td></tr>
+      <tr><td>Tambahan dari Pembagian Absensi</td><td class="right num">${formatRupiah(r.tambahan)}</td></tr>
+      <tr><td>Tambahan dari Potongan Telat</td><td class="right num">${formatRupiah(r.tambahanTelat)}</td></tr>
+      <tr class="slip-subtotal"><td>Total Pendapatan + Tambahan</td><td class="right num">${formatRupiah(pendapatan + tambahanAll)}</td></tr>
+
+      <tr class="slip-section"><td colspan="2">Potongan</td></tr>
+      <tr><td>Kasbon</td><td class="right num">${formatRupiah(r.kasbon)}</td></tr>
+      <tr><td>Cicilan</td><td class="right num">${formatRupiah(r.cicilan)}</td></tr>
+      <tr><td>Potongan Tidak Masuk</td><td class="right num">${formatRupiah(r.potongan)}</td></tr>
+      <tr><td>Potongan Telat</td><td class="right num">${formatRupiah(r.potonganTelat)}</td></tr>
+      <tr class="slip-subtotal"><td>Total Potongan</td><td class="right num">${formatRupiah(totalPotonganBaris)}</td></tr>
+    </table>
+    <div class="slip-total">
+      <span>SALDO BERSIH</span>
+      <b class="num">${formatRupiah(saldo)}</b>
+    </div>
+    <div class="slip-sign">
+      <div><div class="line"></div>Diterima oleh<br>(${escapeHtml(r.name)})</div>
+      <div><div class="line"></div>Diketahui oleh</div>
+    </div>
+    <div class="slip-footer-note">Dicetak otomatis dari KasbonDonk by Garuda Steam — Buku Kas Digital Karyawan.</div>
+  </div>`;
+}
+
+function generateSlips(){
+  const selected = employees.filter(e=>{
+    const chk = document.getElementById('slipchk_'+e.id);
+    return chk && chk.checked;
+  }).map(e=>e.id);
+
+  if(selected.length === 0){
+    showToast('Pilih minimal satu karyawan terlebih dahulu.');
+    return;
+  }
+
+  slipSelectedIds = selected;
+  const report = calcMonthReport(slipMonth);
+  slipPreviewHTML = selected.map(id => buildSlipHTML(id, slipMonth, report)).join('');
+  document.getElementById('slipPrintArea').innerHTML = slipPreviewHTML;
+  showToast(`${selected.length} slip ditampilkan.`);
+}
+
+function printSlips(){
+  if(!slipPreviewHTML){
+    showToast('Tampilkan slip terlebih dahulu sebelum mencetak.');
+    return;
+  }
+  window.print();
+}
+
+/* ===================== PENGATURAN ===================== */
+function renderPengaturan(){
+  return `
+    <h2 class="section-title">Pengaturan</h2>
+    <p class="section-sub">Atur jam kerja (masuk & tutup) tiap hari, besar potongan tidak masuk, dan potongan telat per jam.</p>
+
+    <div class="form-row">
+      <div class="field">
+        <label>Potongan Tidak Masuk (Rp)</label>
+        <input id="setDendaTidakMasuk" class="num-input" type="number" min="0" step="1000" value="${settings.dendaTidakMasuk}">
+      </div>
+      <div class="field">
+        <label>Potongan Telat / Jam (Rp)</label>
+        <input id="setDendaTelat" class="num-input" type="number" min="0" step="500" value="${settings.dendaTelatPerJam}">
+      </div>
+    </div>
+
+    <div class="section-sub" style="margin-top:6px; margin-bottom:8px; font-weight:600; color:var(--ink);">Jam Kerja per Hari</div>
+    <div class="jamkerja-grid">
+      ${DAY_NAMES.map((name, idx)=>`
+        <div class="jamkerja-row">
+          <div class="day-name">${name}</div>
+          <div class="jam-field">
+            <label>Masuk</label>
+            <select id="jamkerja_${idx}">${hourOptionsPlain(settings.jamKerja[idx])}</select>
+          </div>
+          <div class="jam-field">
+            <label>Tutup</label>
+            <select id="jamtutup_${idx}">${hourOptionsPlain(settings.jamTutup[idx])}</select>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <button class="btn btn-primary" onclick="submitPengaturan()">Simpan Pengaturan</button>
+
+    <div class="note-box" style="margin-top:26px; padding-top:18px; border-top:1.5px solid var(--line);">
+      <b style="color:var(--ink);">Export &amp; Import Data (Excel)</b><br>
+      Export menyimpan seluruh data (karyawan, kasbon, absensi, pendapatan, cicilan, pengaturan) ke satu file .xlsx untuk backup atau dipindah ke perangkat lain.
+      Import akan <b>mengganti seluruh data yang ada saat ini</b> dengan isi file Excel yang diunggah — pastikan formatnya sesuai hasil export dari aplikasi ini.
+    </div>
+    <div class="data-actions">
+      <button class="btn btn-primary" onclick="exportToExcel()">⬇️ Export ke Excel</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('importFileInput').click()">⬆️ Import dari Excel</button>
+    </div>
+  `;
+}
+
+async function submitPengaturan(){
+  const dendaTidakMasuk = Number(document.getElementById('setDendaTidakMasuk').value) || 0;
+  const dendaTelatPerJam = Number(document.getElementById('setDendaTelat').value) || 0;
+  const jamKerja = {};
+  const jamTutup = {};
+  DAY_NAMES.forEach((name, idx)=>{
+    const selMasuk = document.getElementById('jamkerja_'+idx);
+    const selTutup = document.getElementById('jamtutup_'+idx);
+    jamKerja[idx] = selMasuk && selMasuk.value !== '' ? Number(selMasuk.value) : 9;
+    jamTutup[idx] = selTutup && selTutup.value !== '' ? Number(selTutup.value) : 17;
+  });
+  settings = { dendaTidakMasuk, dendaTelatPerJam, jamKerja, jamTutup };
+  await saveSettings();
+  showToast('Pengaturan disimpan.');
+}
+
+/* Cara 1 (paling andal di APK): kirim file lewat Netlify Function supaya nama file
+   & tipe file terkirim benar lewat header HTTP asli (bukan blob: yang bikin "download.bin").
+   Cara 2: Share Sheet Android bawaan. Cara 3: unduhan browser biasa (desktop/Claude.ai). */
+async function exportWorkbookForPlatform(wb, filename){
+  let base64 = '';
+  try{ base64 = XLSX.write(wb, {bookType:'xlsx', type:'base64'}); }
+  catch(err){ console.error('Gagal membuat base64 workbook:', err); }
+
+  if(base64){
+    try{
+      const viaNetlify = await tryNetlifyFunctionExport(base64, filename);
+      if(viaNetlify){ showToast('File Excel sedang diunduh...'); return; }
+    }catch(err){ console.error('Export via Netlify Function gagal:', err); }
+  }
+
+  try{
+    const arrayBuffer = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+    const blob = new Blob([arrayBuffer], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const file = new File([blob], filename, {type: blob.type});
+
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:filename, text:'Data KasbonDonk'});
+      showToast('Pilih tempat menyimpan file di menu share.');
+      return;
+    }
+  }catch(err){
+    console.error('Share export gagal, coba unduh biasa:', err);
+  }
+
+  try{
+    XLSX.writeFile(wb, filename);
+    showToast('Data diekspor ke Excel.');
+  }catch(err){
+    console.error(err);
+    showToast('Export gagal di aplikasi ini. Coba buka lewat browser Chrome.');
+  }
+}
+
+/* Cek dulu apakah Netlify Function-nya sudah di-deploy (GET/HEAD dibalas cepat).
+   Kalau belum ada (404 / gagal fetch), diamkan saja dan lanjut ke cara berikutnya. */
+async function tryNetlifyFunctionExport(base64, filename){
+  try{
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), 3000);
+    const res = await fetch('/.netlify/functions/download-xlsx', {method:'GET', signal:controller.signal});
+    clearTimeout(timeout);
+    if(!res.ok) return false;
+  }catch(err){
+    return false;
+  }
+  return submitExportForm(base64, filename);
+}
+
+function submitExportForm(base64, filename){
+  return new Promise((resolve)=>{
+    const filenameInput = document.getElementById('exportFilenameInput');
+    const base64Input = document.getElementById('exportBase64Input');
+    const form = document.getElementById('exportForm');
+    if(!filenameInput || !base64Input || !form){ resolve(false); return; }
+    filenameInput.value = filename;
+    base64Input.value = base64;
+    form.submit();
+    setTimeout(()=> resolve(true), 400);
+  });
+}
+
+
+async function exportToExcel(){
+  if(typeof XLSX === 'undefined'){ showToast('Modul Excel belum siap, coba lagi sebentar.'); return; }
+  try{
+    const wb = XLSX.utils.book_new();
+
+    const karyawanRows = employees.map(e=>({Nama:e.name, GajiTetap:e.gajiTetap||0}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(karyawanRows.length?karyawanRows:[{Nama:'',GajiTetap:''}]), 'Karyawan');
+
+    const kasbonRows = kasbonRecords.map(k=>({Tanggal:k.date, Karyawan:empName(k.employeeId), Jumlah:k.amount, Catatan:k.note||''}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(kasbonRows.length?kasbonRows:[{Tanggal:'',Karyawan:'',Jumlah:'',Catatan:''}]), 'Kasbon');
+
+    const absensiRows = [];
+    absensiRecords.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(a=>{
+      employees.forEach(e=>{
+        const status = getDayStatus(a, e.id);
+        const jam = (a.arrivals && a.arrivals[e.id]!==undefined) ? a.arrivals[e.id] : '';
+        absensiRows.push({
+          Tanggal:a.date, Karyawan:e.name,
+          Status: status==='absen'?'Tidak Masuk':(status==='libur'?'Libur':'Hadir'),
+          JamDatang: jam
+        });
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(absensiRows.length?absensiRows:[{Tanggal:'',Karyawan:'',Status:'',JamDatang:''}]), 'Absensi');
+
+    const pendapatanRows = pendapatanRecords.map(p=>({Bulan:p.month, Karyawan:empName(p.employeeId), BagiHasil:p.amount}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pendapatanRows.length?pendapatanRows:[{Bulan:'',Karyawan:'',BagiHasil:''}]), 'Pendapatan');
+
+    const cicilanRows = cicilanRecords.map(c=>({Karyawan:empName(c.employeeId), TotalCicilan:c.totalAmount, JumlahKali:c.jumlahKali, MulaiBulan:c.mulaiBulan, Catatan:c.catatan||''}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(cicilanRows.length?cicilanRows:[{Karyawan:'',TotalCicilan:'',JumlahKali:'',MulaiBulan:'',Catatan:''}]), 'Cicilan');
+
+    const settingsRows = [
+      {Pengaturan:'Potongan Tidak Masuk (Rp)', Nilai: settings.dendaTidakMasuk},
+      {Pengaturan:'Potongan Telat per Jam (Rp)', Nilai: settings.dendaTelatPerJam},
+      ...DAY_NAMES.map((name, idx)=>({Pengaturan:'Jam Masuk '+name, Nilai: settings.jamKerja[idx]})),
+      ...DAY_NAMES.map((name, idx)=>({Pengaturan:'Jam Tutup '+name, Nilai: settings.jamTutup[idx]}))
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settingsRows), 'Pengaturan');
+
+    await exportWorkbookForPlatform(wb, `kasbondonk-data-${todayISO()}.xlsx`);
+
+  }catch(err){
+    console.error(err);
+    showToast('Gagal mengekspor data.');
+  }
+}
+
+function sheetRows(wb, name){
+  const ws = wb.Sheets[name];
+  if(!ws) return [];
+  return XLSX.utils.sheet_to_json(ws, {defval:''});
+}
+
+async function handleImportFile(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  if(typeof XLSX === 'undefined'){ showToast('Modul Excel belum siap, coba lagi sebentar.'); evt.target.value=''; return; }
+
+  const ok = confirm('Import akan MENGGANTI seluruh data karyawan, kasbon, absensi, pendapatan, cicilan, dan pengaturan saat ini dengan isi file Excel ini. Lanjutkan?');
+  if(!ok){ evt.target.value=''; return; }
+
+  try{
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data, {type:'array'});
+
+    const karyawanRows = sheetRows(wb, 'Karyawan');
+    const newEmployees = [];
+    const nameToId = {};
+    karyawanRows.forEach(row=>{
+      const name = String(row.Nama||'').trim();
+      if(!name) return;
+      const gajiTetap = Number(row.GajiTetap)||0;
+      const id = uid();
+      newEmployees.push({id, name, gajiTetap});
+      nameToId[name.toLowerCase()] = id;
+    });
+    function resolveEmp(nameRaw){
+      const name = String(nameRaw||'').trim();
+      if(!name) return null;
+      const key = name.toLowerCase();
+      if(nameToId[key]) return nameToId[key];
+      const id = uid();
+      newEmployees.push({id, name, gajiTetap:0});
+      nameToId[key] = id;
+      return id;
+    }
+
+    const kasbonRows = sheetRows(wb, 'Kasbon');
+    const newKasbon = kasbonRows.map(row=>{
+      const empId = resolveEmp(row.Karyawan);
+      const date = String(row.Tanggal||'').slice(0,10);
+      if(!empId || !date) return null;
+      return {id:uid(), employeeId:empId, amount:Number(row.Jumlah)||0, date, note:String(row.Catatan||'')};
+    }).filter(Boolean);
+
+    const absensiRows = sheetRows(wb, 'Absensi');
+    const byDate = {};
+    absensiRows.forEach(row=>{
+      const date = String(row.Tanggal||'').slice(0,10);
+      const empId = resolveEmp(row.Karyawan);
+      if(!date || !empId) return;
+      if(!byDate[date]) byDate[date] = {id:uid(), date, absentIds:[], liburIds:[], arrivals:{}};
+      const status = String(row.Status||'Hadir').trim();
+      if(status==='Tidak Masuk') byDate[date].absentIds.push(empId);
+      else if(status==='Libur') byDate[date].liburIds.push(empId);
+      else if(row.JamDatang !== '' && row.JamDatang !== undefined && row.JamDatang !== null && !isNaN(Number(row.JamDatang))){
+        byDate[date].arrivals[empId] = Number(row.JamDatang);
+      }
+    });
+    const newAbsensi = Object.values(byDate);
+
+    const pendapatanRows = sheetRows(wb, 'Pendapatan');
+    const newPendapatan = pendapatanRows.map(row=>{
+      const empId = resolveEmp(row.Karyawan);
+      const month = String(row.Bulan||'').slice(0,7);
+      if(!empId || !month) return null;
+      const amountRaw = row.BagiHasil !== undefined && row.BagiHasil !== '' ? row.BagiHasil : row.PendapatanTambahan;
+      return {id:uid(), employeeId:empId, month, amount:Number(amountRaw)||0};
+    }).filter(Boolean);
+
+    const cicilanRows = sheetRows(wb, 'Cicilan');
+    const newCicilan = cicilanRows.map(row=>{
+      const empId = resolveEmp(row.Karyawan);
+      const mulaiBulan = String(row.MulaiBulan||'').slice(0,7);
+      if(!empId || !mulaiBulan || !row.TotalCicilan) return null;
+      return {
+        id:uid(), employeeId:empId,
+        totalAmount:Number(row.TotalCicilan)||0,
+        jumlahKali:Math.max(1, Math.floor(Number(row.JumlahKali)||1)),
+        mulaiBulan, catatan:String(row.Catatan||'')
+      };
+    }).filter(Boolean);
+
+    const settingsRows = sheetRows(wb, 'Pengaturan');
+    const newSettings = {
+      dendaTidakMasuk:50000, dendaTelatPerJam:5000,
+      jamKerja:{0:9,1:9,2:9,3:9,4:9,5:9,6:9},
+      jamTutup:{0:17,1:17,2:17,3:17,4:17,5:17,6:17}
+    };
+    settingsRows.forEach(row=>{
+      const label = String(row.Pengaturan||'');
+      const val = Number(row.Nilai);
+      if(label==='Potongan Tidak Masuk (Rp)') newSettings.dendaTidakMasuk = (val || val===0) ? val : 50000;
+      else if(label==='Potongan Telat per Jam (Rp)') newSettings.dendaTelatPerJam = (val || val===0) ? val : 5000;
+      else {
+        DAY_NAMES.forEach((name, idx)=>{
+          if(label === 'Jam Masuk '+name) newSettings.jamKerja[idx] = (val || val===0) ? val : 9;
+          if(label === 'Jam Tutup '+name) newSettings.jamTutup[idx] = (val || val===0) ? val : 17;
+        });
+      }
+    });
+
+    employees = newEmployees;
+    kasbonRecords = newKasbon;
+    absensiRecords = newAbsensi;
+    pendapatanRecords = newPendapatan;
+    cicilanRecords = newCicilan;
+    settings = newSettings;
+    kasbonFilterEmployee = 'all';
+    slipSelectedIds = [];
+    slipPreviewHTML = '';
+    editingKaryawanId = null; editingKasbonId = null; editingCicilanId = null;
+
+    await Promise.all([saveEmployees(), saveKasbon(), saveAbsensi(), savePendapatan(), saveCicilan(), saveSettings()]);
+    render();
+    showToast('Data berhasil diimpor dari Excel.');
+  }catch(err){
+    console.error(err);
+    showToast('Gagal membaca file. Pastikan formatnya sesuai hasil export aplikasi ini.');
+  }
+  evt.target.value = '';
+}
+
+/* ===================== INIT ===================== */
+(async function init(){
+  await loadAll();
+  document.getElementById('loadingOverlay').remove();
+  if(!storageOK){ showToast('Gagal memuat data tersimpan. Data baru tetap bisa dicatat.'); }
+  switchTab('dashboard');
+})();
+</script>
+</body>
+</html>
